@@ -1,14 +1,14 @@
-# Python OpenGL Playground
+## Python OpenGL Playground
 
-## What is this project supposed to be?
+### What is this project supposed to be?
 
 This is a (in development) 3D rendering application with a physics engine on the (ever so distant) horizon. The purpose of this project is for self learning and a reference for any future related projects.
 
-## Why Python? Why not C++?
+### Why Python? Why not C++?
 
 C++ is what most people consider the better choice for making a 3D rendering engine (and maybe a physics engine, if I get to that). The obvious reason being that Python runs slower and uses more memory. I am aware of this and still chose Python over C++ because I'm probably not going to be performing enough calculations where such an optimization boost is needed. Additionally I prefer Python when learning new topics. If the need for increased performance rises, I will probably look to translate this project into C++.
 
-## Features (unchecked features are still in progress, or on the backlog)
+### Features (unchecked features are still in progress, or on the backlog)
 
 - [x] Imports file
 
@@ -35,7 +35,7 @@ C++ is what most people consider the better choice for making a 3D rendering eng
 - [ ] Manipulation of vertices during runtime for physics purposes (soft body, destructible, etc.)
 - [ ] Properly defined engine with an API to add objects, including adding components, etc.
 
-## Physics engine?
+### Physics engine?
 
 At a certain point along the project, physics will slowly be integrated into this project. This will include the following:
 
@@ -49,7 +49,7 @@ At a certain point along the project, physics will slowly be integrated into thi
   - [ ] Primitive and advanced collision detection systems may be implemented, depending on what is wanted
 - [ ] Collision solving -> solve collisions when they occur, depending on an objects properties
 
-## General Architecture Idea
+### General Architecture Idea
 
 The main idea for an end product would be as follows (pseudocode mockup):
 
