@@ -1,6 +1,6 @@
 from imports import *
 
-class Cube:
+class RenderObject:
 
     def __init__(self, position, eulers):
         self.position = np.array(position, dtype=np.float32)

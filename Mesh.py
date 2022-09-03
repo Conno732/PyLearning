@@ -1,3 +1,4 @@
+from logging.config import listen
 from imports import *
 
 class Mesh:
@@ -32,6 +33,7 @@ class Mesh:
                 flag = line[0:line.find(" ")]
 
                 if flag == "v":
+                    line = line.replace("v  ", "")
                     line = line.replace("v ", "")
                     line = line.split(" ")
                     l = [float(x) for x in line]
@@ -52,12 +54,13 @@ class Mesh:
                 elif flag == "f": 
                     line = line.replace("f ", "")
                     line = line.replace("\n", "")
+                    line = line.strip(" ")
                     line = line.split(" ")
+
 
                     faceVertices = []
                     faceTextures = []
                     faceNormals = []
-                    
                     for vertex in line:
                         # v/vt/vn
                         l = vertex.split("/")
@@ -73,7 +76,7 @@ class Mesh:
                     vertex_order = []
 
                     for i in range(face_triangles):
-                        # all the triangles meet at vertext 0
+                        # all the triangles meet at vertex 0
                         vertex_order.append(0)
                         vertex_order.append(i+1)
                         vertex_order.append(i+2)

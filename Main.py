@@ -1,7 +1,7 @@
 from imports import *
 from Material import *
 from Mesh import *
-from Cube import *
+from RenderObject import *
 from Shader import *
 
 class App:
@@ -20,17 +20,17 @@ class App:
         self.shader.setInt("imageTexture", 0)
 
 
-        self.cube = Cube(
+        self.cube = RenderObject(
             position= [-2, 0, -6],
             eulers= [0, 0, 0]
         )
-        self.cube_mesh = Mesh("meshes/cube.obj")
+        self.cube_mesh = Mesh("meshes/sphere.obj")
 
         self.test_texture = Material("gfx/notha.jpg")
 
         projection_transform = pyrr.matrix44.create_perspective_projection(
             fovy= 45, aspect= height/width,
-            near= 0.1, far= 10, dtype=np.float32
+            near= 0.1, far= 20, dtype=np.float32
         )
 
         self.shader.setMatrix4vf("projection", projection_transform)
@@ -92,7 +92,7 @@ class App:
                 )
             )
             
-            self.shader.setFloatv4("myColor", [0.0, 0.5, color, 1.0])
+            self.shader.setFloatv4("myColor", [color * -1.0, 0.5, color, 1.0])
             self.shader.setMatrix4vf("model", model_transform)
             glBindVertexArray(self.cube_mesh.vao)
             glDrawArrays(GL_TRIANGLES, 0, self.cube_mesh.vertex_count)
