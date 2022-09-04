@@ -1,3 +1,4 @@
+from Camera import Camera
 from imports import *
 from Material import *
 from Mesh import *
@@ -19,22 +20,48 @@ class App:
         self.shader.use()
         self.shader.setInt("imageTexture", 0)
 
+        sphere_mesh = Mesh("meshes/sphere.obj")
 
-        self.sphere1 = RenderObject(
-            position= [-2, 0, -6],
-            eulers= [0, 0, 0],
-            scale=[1, 1, 2]
-        )
-        self.sphere_mesh1 = Mesh("meshes/sphere.obj")
+        self.renderList = {
+            "sphere1" : RenderObject(
+                position= [-2, 0, 0],
+                eulers= [0, 0, 0],
+                scale=[1, 1, 2],
+                mesh= sphere_mesh
+            ),
+             "sphere2" : RenderObject(
+                position= [1, 0, 1],
+                eulers= [0, 0, 0],
+                scale=[1, 1, 2],
+                mesh= sphere_mesh
+            ),
+             "sphere3" : RenderObject(
+                position= [0, 1, 0],
+                eulers= [0, 0, 2],
+                scale=[1, 0.4, 1],
+                mesh= sphere_mesh
+            ),
+            "sphere4" : RenderObject(
+                position= [1, 2, -3],
+                eulers= [0, 0, 0],
+                scale=[0.1, 0.1, 0.1],
+                mesh= sphere_mesh
+            )
 
-        self.sphere2 = RenderObject(
-            position= [-2, 0, -6],
-            eulers= [0, 0, 0],
-            scale=[1, 1, 2]
-        )
-        self.sphere_mesh2 = Mesh("meshes/sphere.obj")
-
+        }
+       
         self.test_texture = Material("gfx/notha.jpg")
+
+        
+        # cameraPos = pyrr.Vector3([0.0, 0.0, 3.0])
+        # cameraTarget = pyrr.Vector3([0.0, 0.0, -1.0])
+        # self.cameraDirction = pyrr.vector.normalise(self.cameraPos -self.cameraTarget)
+        # self.upVector = [0.0, 1.0, 0.0]
+        # self.cameraRight = pyrr.vector.normalise(pyrr.vector3.cross(self.upVector, self.cameraDirction))
+        # self.cameraUp = pyrr.vector3.cross(self.cameraDirction, self.cameraRight)
+
+        self.camera = Camera()
+
 
         projection_transform = pyrr.matrix44.create_perspective_projection(
             fovy= 45, aspect= height/width,
@@ -43,79 +70,66 @@ class App:
 
         self.shader.setMatrix4vf("projection", projection_transform)
         
-        # glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+        #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
         self.mainLoop()
 
     def mainLoop(self):
         
         running = True
-        vector = .1
-        color = 0.0
-        colorV = 0.1
+        self.vector = .1
+        self.color = 0.0
+        self.colorV = 0.1
+        oldTime = pg.time.get_ticks()
+        speed = 0.1
         while (running):
+            deltaTime = oldTime - pg.time.get_ticks()
+            oldTime = deltaTime
             for event in pg.event.get():
                 if (event.type == pg.QUIT):
                     running = False
-
+            key = pg.key.get_pressed()
+            if key[pg.K_w]:
+                self.camera.move("forward", speed)
+            elif key[pg.K_a]:
+                self.camera.move("left", speed)
+            elif key[pg.K_s]:
+                self.camera.move("backward", speed)
+            elif key[pg.K_d]:
+                self.camera.move("right", speed)
+           
             
-            
-            self.cube.position[2] += vector
-            
-            self.cube.eulers[0] += 2
-            
-            if (self.cube.eulers[0] > 360):
-                self.cube.eulers[0] -= 360
-
-            if (self.cube.position[2] < -10) or self.cube.position[2] > -3:
-                vector *= -1
-
-            if color >= 1.0 or color <= -1.0:
-                colorV *= -1.0
-
-            color += colorV
-
+            self.playground()
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
             
             
-
-            self.shader.use()
+            self.shader.use()   
             self.test_texture.use()
+            self.shader.setMatrix4vf("view", self.camera.makeLookAt())
 
-
-            
-
-            self.shader.setFloatv4("myColor", [color * -1.0, 0.5, color, 1.0])
-            self.shader.setMatrix4vf("model", self.cube.SRT())
-            glBindVertexArray(self.cube_mesh.vao)
-            glDrawArrays(GL_TRIANGLES, 0, self.cube_mesh.vertex_count)
-
-            model_transform = pyrr.matrix44.create_identity(dtype=np.float32)
-
-            model_transform = pyrr.matrix44.multiply(
-                m1=model_transform,
-                m2=pyrr.matrix44.create_from_eulers(
-                    eulers=np.radians(self.cube.eulers),
-                    dtype=np.float32
-                )
-            )
-            model_transform = pyrr.matrix44.multiply(
-                m1=model_transform,
-                m2=pyrr.matrix44.create_from_translation(
-                    vec=self.cube.position,
-                    dtype=np.float32
-                )
-            )
-
-            self.shader.setFloatv4("myColor", [0.0, 0.5, color, 1.0])
-            self.shader.setMatrix4vf("model", model_transform)
-            glBindVertexArray(self.cube_mesh.vao)
-            glDrawArrays(GL_TRIANGLES, 0, self.cube_mesh.vertex_count)
+            for renderObjct in self.renderList:
+                self.shader.setFloatv4("myColor", [self.color * -1.0, 0.5, self.color, 1.0])
+                self.shader.setMatrix4vf("model", self.renderList[renderObjct].SRT())
+                self.renderList[renderObjct].draw()
 
             pg.display.flip() 
 
             self.clock.tick(60)
         self.quit()
 
+    def playground(self):
+        self.renderList["sphere1"].position[2] += self.vector
+            
+        self.renderList["sphere1"].eulers[0] += 2
+            
+        if (self.renderList["sphere1"].eulers[0] > 360):
+            self.renderList["sphere1"].eulers[0] -= 360
+        if (self.renderList["sphere1"].position[2] < -10) or self.renderList["sphere1"].position[2] > 10:
+            self.vector *= -1
+
+        if self.color >= 1.0 or self.color <= -1.0:
+            self.colorV *= -1.0
+
+        self.color += self.colorV
 
     def quit(self):
         self.cube_mesh.destroy()

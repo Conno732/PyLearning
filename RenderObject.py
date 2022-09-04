@@ -1,13 +1,17 @@
 from imports import *
+from Mesh import *
 
 class RenderObject:
 
-    def __init__(self, position, eulers, scale):
+    def __init__(self, position, eulers, scale, mesh):
         self.position = np.array(position, dtype=np.float32)
         self.eulers = np.array(eulers, dtype=np.float32)
         self.scale = np.array(scale, dtype=np.float32)
+        self.mesh = mesh
 
     def SRT(self):
+        # This translates the object into the world space
+
         model_transform = pyrr.matrix44.create_identity(dtype=np.float32)
 
 
@@ -38,4 +42,5 @@ class RenderObject:
         return model_transform
 
     def draw(self):
-        pass
+        glBindVertexArray(self.mesh.vao)
+        glDrawArrays(GL_TRIANGLES, 0, self.mesh.vertex_count)
