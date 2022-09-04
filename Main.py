@@ -20,11 +20,19 @@ class App:
         self.shader.setInt("imageTexture", 0)
 
 
-        self.cube = RenderObject(
+        self.sphere1 = RenderObject(
             position= [-2, 0, -6],
-            eulers= [0, 0, 0]
+            eulers= [0, 0, 0],
+            scale=[1, 1, 2]
         )
-        self.cube_mesh = Mesh("meshes/sphere.obj")
+        self.sphere_mesh1 = Mesh("meshes/sphere.obj")
+
+        self.sphere2 = RenderObject(
+            position= [-2, 0, -6],
+            eulers= [0, 0, 0],
+            scale=[1, 1, 2]
+        )
+        self.sphere_mesh2 = Mesh("meshes/sphere.obj")
 
         self.test_texture = Material("gfx/notha.jpg")
 
@@ -74,26 +82,10 @@ class App:
             self.test_texture.use()
 
 
-            model_transform = pyrr.matrix44.create_identity(dtype=np.float32)
-
-            model_transform = pyrr.matrix44.multiply(
-                m1=model_transform,
-                m2=pyrr.matrix44.create_from_eulers(
-                    eulers=np.radians(self.cube.eulers),
-                    dtype=np.float32
-                )
-            )
-
-            model_transform = pyrr.matrix44.multiply(
-                m1=model_transform,
-                m2=pyrr.matrix44.create_from_translation(
-                    vec=[1, 0, -6],
-                    dtype=np.float32
-                )
-            )
             
+
             self.shader.setFloatv4("myColor", [color * -1.0, 0.5, color, 1.0])
-            self.shader.setMatrix4vf("model", model_transform)
+            self.shader.setMatrix4vf("model", self.cube.SRT())
             glBindVertexArray(self.cube_mesh.vao)
             glDrawArrays(GL_TRIANGLES, 0, self.cube_mesh.vertex_count)
 
@@ -123,6 +115,7 @@ class App:
 
             self.clock.tick(60)
         self.quit()
+
 
     def quit(self):
         self.cube_mesh.destroy()
