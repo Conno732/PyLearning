@@ -23,40 +23,54 @@ class App:
         self.shader.setInt("imageTexture", 0)
         pg.mouse.set_visible(False)
         self.sphere_mesh = Mesh("meshes/sphere.obj")
-
+        self.terrain_mesh = Mesh("meshes/wierdland.obj")
         self.renderList = {
             "sphere1" : RenderObject(
                 position= [-2, 0, 0],
                 eulers= [0, 0, 0],
                 scale=[1, 1, 2],
-                mesh= self.sphere_mesh
+                mesh= self.sphere_mesh,
+                textureName= "wood"
             ),
              "sphere2" : RenderObject(
                 position= [1, 0, 1],
                 eulers= [0, 0, 0],
                 scale=[1, 1, 2],
-                mesh= self.sphere_mesh
+                mesh= self.sphere_mesh,
+                textureName="wood"
             ),
              "sphere3" : RenderObject(
                 position= [0, 1, 0],
                 eulers= [0, 0, 2],
                 scale=[1, 0.4, 1],
-                mesh= self.sphere_mesh
+                mesh= self.sphere_mesh,
+                textureName="wood"
             ),
             "sphere4" : RenderObject(
                 position= [1, 2, -3],
                 eulers= [0, 0, 0],
                 scale=[0.1, 0.1, 0.1],
-                mesh= self.sphere_mesh
+                mesh= self.sphere_mesh,
+                textureName="wood"
+            ),
+            "terrain" : RenderObject(
+                position= [0, -3, 0],
+                eulers=[0,0,0],
+                scale=[1,1,1],
+                mesh=self.terrain_mesh,
+                textureName="grass"
             )
 
         }
        
-        self.test_texture = Material("gfx/notha.jpg")
+        self.textureList = {
+            "wood" : Material("gfx/notha.jpg"),
+            "grass" : Material("gfx/grass.jpg")
+        }
 
         self.camera = Camera("FPS")
         
-        #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+        
         self.mainLoop()
 
     def mainLoop(self):
@@ -109,11 +123,11 @@ class App:
             self.shader.setMatrix4vf("projection", projection_transform)
 
             self.shader.use()   
-            self.test_texture.use()
             self.shader.setMatrix4vf("view", self.camera.makeLookAt())
 
             for renderObjct in self.renderList:
-                self.shader.setFloatv4("myColor", [self.color * -1.0, 0.5, self.color, 1.0])
+                self.textureList[self.renderList[renderObjct].textureName].use()
+                self.shader.setFloatv4("myColor", [0, 0, 0, 0])
                 self.shader.setMatrix4vf("model", self.renderList[renderObjct].SRT())
                 self.renderList[renderObjct].draw()
 
@@ -146,17 +160,20 @@ class App:
             self.camera.move("backward", speed)
         if key[pg.K_d]:
             self.camera.move("right", speed)
-        if key[pg.K_SPACE]:
-            self.camera.move("up", speed)
-        if key[pg.K_LCTRL]:
-            self.camera.move("down", speed)
+        # if key[pg.K_SPACE]:
+        #     self.camera.move("up", speed)
+        # if key[pg.K_LCTRL]:
+        #     self.camera.move("down", speed)
         if key[pg.K_ESCAPE]:
             self.running = False
+        if key[pg.K_0]:
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
         
 
     def quit(self):
+        for texture in self.textureList:
+            self.textureList[texture].destroy()
         self.sphere_mesh.destroy()
-        self.test_texture.destroy()
         self.shader.delete()
         pg.quit()
 

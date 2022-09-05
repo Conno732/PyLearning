@@ -43,11 +43,12 @@ At a certain point along the project, physics will slowly be integrated into thi
 - [ ] Object properties, such as mass, associated with specific materials.
 
 - [ ] Collision detection - This one requires a lot more effort, but will most likely contain:
-  - [ ] A ton of optimization
   - [ ] Detection between any two convex 3D objects (maybe concave as well?)
   - [ ] Research and implementation for data structures that optimize which objects need to be checked for collisions
   - [ ] Primitive and advanced collision detection systems may be implemented, depending on what is wanted
 - [ ] Collision solving -> solve collisions when they occur, depending on an objects properties
+- [ ] Rigid body collision /simulation
+- [ ] Soft body simulation
 
 ### General Architecture Idea
 

@@ -3,7 +3,7 @@ from imports import *
 class Material:
 
     def __init__(self, filepath):
-
+        #add stuff for wrapping, nearest, etc with constructor
         self.texture = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, self.texture)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
