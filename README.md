@@ -34,6 +34,7 @@ C++ is what most people consider the better choice for making a 3D rendering eng
 - [ ] Advanced OpenGL stuff (cool shaders n stuff, skyboxes, frame culling, anti aliasing )
 - [ ] Manipulation of vertices during runtime for physics purposes (soft body, destructible, etc.)
 - [ ] Properly defined engine with an API to add objects, including adding components, etc.
+- [ ] A seperate window to edit and manage objects.
 
 ### Physics engine?
 

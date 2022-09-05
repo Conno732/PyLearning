@@ -4,6 +4,7 @@ class Material:
 
     def __init__(self, filepath):
         #add stuff for wrapping, nearest, etc with constructor
+        #add ability to input multiple filepaths for multiple textures per material
         self.texture = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, self.texture)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)

@@ -3,12 +3,16 @@ from Mesh import *
 
 class RenderObject:
 
-    def __init__(self, position, eulers, scale, mesh, textureName):
+    def __init__(self, position, eulers, scale, mesh, shader, texture = False, color = [0, 0, 0, 0]):
         self.position = np.array(position, dtype=np.float32)
         self.eulers = np.array(eulers, dtype=np.float32)
         self.scale = np.array(scale, dtype=np.float32)
         self.mesh = mesh
-        self.textureName = textureName
+        self.texture = texture
+        self.color = color
+        self.shader = shader
+        self.shader.use()
+        self.shader.setInt("imageTexture", 0)
 
     def SRT(self):
         # This translates the object into the world space
