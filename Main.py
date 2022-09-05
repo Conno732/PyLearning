@@ -1,4 +1,4 @@
-from Camera import Camera
+from Camera import *
 from imports import *
 from Material import *
 from Mesh import *
@@ -10,8 +10,10 @@ class App:
     def __init__(self, height, width):
         pg.init()
         pg.display.set_mode((height, width), pg.OPENGL | pg.DOUBLEBUF)
+        pg.event.set_grab(True)
         self.clock = pg.time.Clock()
-
+        self.window_height = height
+        self.window_width = width
         glClearColor(0.1, 0, 0.2, 1)
         glEnable(GL_BLEND)
         glEnable(GL_DEPTH_TEST)
@@ -19,89 +21,93 @@ class App:
         self.shader = Shader("shaders/vertex.txt", "shaders/fragment.txt")
         self.shader.use()
         self.shader.setInt("imageTexture", 0)
-
-        sphere_mesh = Mesh("meshes/sphere.obj")
+        pg.mouse.set_visible(False)
+        self.sphere_mesh = Mesh("meshes/sphere.obj")
 
         self.renderList = {
             "sphere1" : RenderObject(
                 position= [-2, 0, 0],
                 eulers= [0, 0, 0],
                 scale=[1, 1, 2],
-                mesh= sphere_mesh
+                mesh= self.sphere_mesh
             ),
              "sphere2" : RenderObject(
                 position= [1, 0, 1],
                 eulers= [0, 0, 0],
                 scale=[1, 1, 2],
-                mesh= sphere_mesh
+                mesh= self.sphere_mesh
             ),
              "sphere3" : RenderObject(
                 position= [0, 1, 0],
                 eulers= [0, 0, 2],
                 scale=[1, 0.4, 1],
-                mesh= sphere_mesh
+                mesh= self.sphere_mesh
             ),
             "sphere4" : RenderObject(
                 position= [1, 2, -3],
                 eulers= [0, 0, 0],
                 scale=[0.1, 0.1, 0.1],
-                mesh= sphere_mesh
+                mesh= self.sphere_mesh
             )
 
         }
        
         self.test_texture = Material("gfx/notha.jpg")
 
-        
-        # cameraPos = pyrr.Vector3([0.0, 0.0, 3.0])
-        # cameraTarget = pyrr.Vector3([0.0, 0.0, -1.0])
-        # self.cameraDirction = pyrr.vector.normalise(self.cameraPos -self.cameraTarget)
-        # self.upVector = [0.0, 1.0, 0.0]
-        # self.cameraRight = pyrr.vector.normalise(pyrr.vector3.cross(self.upVector, self.cameraDirction))
-        # self.cameraUp = pyrr.vector3.cross(self.cameraDirction, self.cameraRight)
-
-        self.camera = Camera()
-
-
-        projection_transform = pyrr.matrix44.create_perspective_projection(
-            fovy= 45, aspect= height/width,
-            near= 0.1, far= 20, dtype=np.float32
-        )
-
-        self.shader.setMatrix4vf("projection", projection_transform)
+        self.camera = Camera("FPS")
         
         #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
         self.mainLoop()
 
     def mainLoop(self):
         
-        running = True
+        self.running = True
         self.vector = .1
         self.color = 0.0
         self.colorV = 0.1
         oldTime = pg.time.get_ticks()
         speed = 0.1
-        while (running):
+        sensitivity = 0.15
+        fovy = 90
+        while (self.running):
             deltaTime = oldTime - pg.time.get_ticks()
             oldTime = deltaTime
             for event in pg.event.get():
                 if (event.type == pg.QUIT):
-                    running = False
+                    self.running = False
+                if event.type == pg.MOUSEMOTION:
+                    offsets = event.rel
+                    self.camera.rotateWithMouseOffset(offsets[0], offsets[1], sensitivity)
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    if event.button == 4:
+                        fovy -= 5
+                        if fovy < 1:
+                            fovy = 1
+                    if event.button == 5:
+                        fovy += 5
+                        if fovy > 120:
+                            fovy = 120
+
+                    
+        
+                    
             key = pg.key.get_pressed()
-            if key[pg.K_w]:
-                self.camera.move("forward", speed)
-            elif key[pg.K_a]:
-                self.camera.move("left", speed)
-            elif key[pg.K_s]:
-                self.camera.move("backward", speed)
-            elif key[pg.K_d]:
-                self.camera.move("right", speed)
-           
+
+            self.playerInput(key, speed)
+            
             
             self.playground()
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
             
             
+            projection_transform = pyrr.matrix44.create_perspective_projection(
+                fovy= fovy, aspect= self.window_height/self.window_width,
+                near= 0.1, far= 100, dtype=np.float32
+            )
+
+
+            self.shader.setMatrix4vf("projection", projection_transform)
+
             self.shader.use()   
             self.test_texture.use()
             self.shader.setMatrix4vf("view", self.camera.makeLookAt())
@@ -131,12 +137,29 @@ class App:
 
         self.color += self.colorV
 
+    def playerInput(self, key, speed):
+        if key[pg.K_w]:
+            self.camera.move("forward", speed)
+        if key[pg.K_a]:
+            self.camera.move("left", speed)
+        if key[pg.K_s]:
+            self.camera.move("backward", speed)
+        if key[pg.K_d]:
+            self.camera.move("right", speed)
+        if key[pg.K_SPACE]:
+            self.camera.move("up", speed)
+        if key[pg.K_LCTRL]:
+            self.camera.move("down", speed)
+        if key[pg.K_ESCAPE]:
+            self.running = False
+        
+
     def quit(self):
-        self.cube_mesh.destroy()
+        self.sphere_mesh.destroy()
         self.test_texture.destroy()
         self.shader.delete()
         pg.quit()
 
 
 if __name__ == "__main__":
-    myApp = App(720, 520)
+    myApp = App(1080, 720)
