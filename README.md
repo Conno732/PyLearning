@@ -28,7 +28,7 @@ C++ is what most people consider the better choice for making a 3D rendering eng
 
 - [x] Material class, used for importing image data and sampled by the vertex texture data
 
-- [x ] 'Camera' class, allowing for the user to traverse the 3D world.
+- [x] 'Camera' class, allowing for the user to traverse the 3D world.
 - [ ] Basic lighting
 - [ ] Additional model loading
 - [ ] Advanced OpenGL stuff (cool shaders n stuff, skyboxes, frame culling, anti aliasing )
