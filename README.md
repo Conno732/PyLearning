@@ -4,9 +4,6 @@
 
 This is a (in development) 3D rendering application with a physics engine on the (ever so distant) horizon. The purpose of this project is for self learning and a reference for any future related projects.
 
-### Why Python? Why not C++?
-
-C++ is what most people consider the better choice for making a 3D rendering engine (and maybe a physics engine, if I get to that). The obvious reason being that Python runs slower and uses more memory. I am aware of this and still chose Python over C++ because I'm probably not going to be performing enough calculations where such an optimization boost is needed. Additionally I prefer Python when learning new topics. If the need for increased performance rises, I will probably look to translate this project into C++. This is probably not going to happen, since any performance issue is probably due to a need for optimization, rather than the language.
 
 ### Features (unchecked features are still in progress, or on the backlog)
 
