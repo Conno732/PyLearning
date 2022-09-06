@@ -12,7 +12,7 @@ class RenderObject:
         self.color = color
         self.shader = shader
         self.shader.use()
-        self.shader.setInt("imageTexture", 0)
+        #self.shader.setInt("imageTexture", 0)
 
     def SRT(self):
         # This translates the object into the world space

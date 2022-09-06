@@ -18,11 +18,14 @@ class App:
         glEnable(GL_BLEND)
         glEnable(GL_DEPTH_TEST)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        glEnable(GL_CULL_FACE); 
         
         pg.mouse.set_visible(False)
 
         self.shaderList = {
-            "v1" : Shader("shaders/v1/vertex.txt", "shaders/v1/fragment.txt")
+            "v1" : Shader("shaders/v1/vertex.txt", "shaders/v1/fragment.txt"),
+            "v2" : Shader("shaders/v2/vertex.txt", "shaders/v2/fragment.txt"),
+            "lighting_v1" : Shader("shaders/lighting_v1/vertex.txt", "shaders/lighting_v1/fragment.txt")
         }
 
         self.meshList = {
@@ -44,15 +47,23 @@ class App:
                 eulers= [0, 0, 0],
                 scale=[1, 1, 2],
                 mesh= self.meshList["sphere"],
-                shader= self.shaderList["v1"],
+                shader= self.shaderList["v2"],
                 texture= self.textureList["wood"],
             ),
-             "sphere2" : RenderObject(
-                position= [1, 0, 1],
+            "sphere11" : RenderObject(
+                position= [0, 2, 4],
                 eulers= [0, 0, 0],
                 scale=[1, 1, 2],
                 mesh= self.meshList["sphere"],
-                shader= self.shaderList["v1"],
+                shader= self.shaderList["v2"],
+                texture= self.textureList["wood"],
+            ),
+             "sphere2" : RenderObject(
+                position= [1, 4, 1],
+                eulers= [0, 0, 0],
+                scale=[1, 1, 2],
+                mesh= self.meshList["sphere"],
+                shader= self.shaderList["v2"],
                 texture= self.textureList["wood"]
             ),
              "sphere3" : RenderObject(
@@ -60,7 +71,7 @@ class App:
                 eulers= [0, 0, 2],
                 scale=[1, 0.4, 1],
                 mesh= self.meshList["sphere"],
-                shader= self.shaderList["v1"],
+                shader= self.shaderList["v2"],
                 texture= self.textureList["wood"]
             ),
             "sphere4" : RenderObject(
@@ -68,25 +79,61 @@ class App:
                 eulers= [0, 0, 0],
                 scale=[0.1, 0.1, 0.1],
                 mesh= self.meshList["sphere"],
-                shader= self.shaderList["v1"],
+                shader= self.shaderList["v2"],
                 texture= self.textureList["wood"]
             ),
             "cube1" : RenderObject(
                 position= [20, 10, 0],
                 eulers=[0, 2, 4],
-                scale=[10, 10, 10],
+                scale=[6, 6, 6],
                 mesh= self.meshList["cube"],
-                shader= self.shaderList["v1"],
+                shader= self.shaderList["v2"],
                 texture= self.textureList["red"],
-                color=[0, 0.5, 0.0, 0.0]
+                color=[1.0, 0.5, 0.31, 0.0]
             ),
             "terrain" : RenderObject(
                 position= [0, -3, 0],
                 eulers=[0,0,0],
                 scale=[1,1,1],
                 mesh= self.meshList["terrain"],
-                shader= self.shaderList["v1"],
-                texture= self.textureList["grass"]
+                shader= self.shaderList["v2"],
+                texture= self.textureList["grass"],
+                color=[1.0, 0.5, 0.31, 0.0]
+            ),
+            "terrain2" : RenderObject(
+                position= [50, -3, 0],
+                eulers=[0,0,0],
+                scale=[1,1,1],
+                mesh= self.meshList["terrain"],
+                shader= self.shaderList["v2"],
+                texture= self.textureList["grass"],
+                color=[1.0, 0.5, 0.31, 0.0]
+            ),
+            "terrain3" : RenderObject(
+                position= [-50, -3, 0],
+                eulers=[0,0,0],
+                scale=[1,1,1],
+                mesh= self.meshList["terrain"],
+                shader= self.shaderList["v2"],
+                texture= self.textureList["grass"],
+                color=[1.0, 0.5, 0.31, 0.0]
+            ),
+            "terrain4" : RenderObject(
+                position= [-50, -3, 80],
+                eulers=[0,0,0],
+                scale=[1,1,1],
+                mesh= self.meshList["terrain"],
+                shader= self.shaderList["v2"],
+                texture= self.textureList["grass"],
+                color=[1.0, 0.5, 0.31, 0.0]
+            ),
+            "light" : RenderObject(
+                position=[0, 10, 0],
+                eulers=[0,0,0],
+                scale=[1,1,1],
+                mesh= self.meshList["cube"],
+                shader= self.shaderList["lighting_v1"],
+                texture= self.textureList["red"]
             )
 
         }
@@ -107,12 +154,14 @@ class App:
         fovy = 90
         self.deltaTime = 1
         oldTime = 0
+        self.radius = 20
+        self.count = 0
         while (self.running):
-            pg.display.set_caption("FPS: " + str(1.0 / (self.deltaTime)))
+            #pg.display.set_caption("FPS: " + str(1.0 / (self.deltaTime)))
             time = pg.time.get_ticks()
             self.deltaTime = ((time - oldTime) + 1) / 1000.0
             oldTime = time
-            
+            self.count += 0.5 * self.deltaTime
 
             for event in pg.event.get():
                 if (event.type == pg.QUIT):
@@ -162,13 +211,23 @@ class App:
                 else:
                     self.textureList["missing"].use()
 
-                obj.shader.setFloatv4("myColor", obj.color)
-                obj.shader.setMatrix4vf("model", obj.SRT())
+                obj.shader.setFloatv4("objColor", obj.color)
+                model = obj.SRT()
+                obj.shader.setMatrix4vf("model", model)
+
+                if self.shaderList["v2"] == obj.shader:
+                    inverse = pyrr.matrix33.inverse(model)
+                    transpose = inverse.transpose()
+                    obj.shader.setMatrix3vf("NormalMatrix", transpose)
+                    obj.shader.setFloatv3("lightColor", [1.0, 1.0, 1.0])
+                    obj.shader.setFloatv3("lightPos", self.renderList["light"].position)
+                    obj.shader.setFloatv3("viewPos", self.camera.cameraPos)
+                
                 obj.draw()
 
             pg.display.flip() 
 
-            #self.clock.tick(60)
+            self.clock.tick(60)
         self.quit()
 
     def playground(self):
@@ -179,7 +238,11 @@ class App:
         if (self.renderList["sphere1"].eulers[0] > 360):
             self.renderList["sphere1"].eulers[0] -= 360
         if (self.renderList["sphere1"].position[2] < -10) or self.renderList["sphere1"].position[2] > 10:
-            self.vector *= -1
+            self.vector *= -1 
+
+        self.renderList["light"].position[0] = (cos(self.count) * self.radius) + 20 
+        self.renderList["light"].position[2] = (sin(self.count) * self.radius ) 
+        #self.renderList["light"].position[1] = (sin(self.count) * self.radius) + 10
 
 
     def playerInput(self, key, speed):

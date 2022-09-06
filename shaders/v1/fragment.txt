@@ -6,9 +6,9 @@ out vec4 color;
 
 uniform sampler2D imageTexture;
 
-uniform vec4 myColor;
+uniform vec4 objColor;
 
 void main()
 {
-    color = (texture(imageTexture, fragmentTexCoord) + myColor);
+    color = (texture(imageTexture, fragmentTexCoord) + objColor);
 }

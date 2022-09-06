@@ -11,16 +11,14 @@ class Camera:
         self.pitch = 0.0
         self.yaw = -90.0
         self.mode = mode
-        self.removeY = np.array([[1,0,0],
-                                 [0,0,0],
-                                 [0,0,1]])
 
     def makeLookAt(self):
         return pyrr.matrix44.create_look_at(self.cameraPos, self.cameraPos + self.cameraFront, self.cameraUp)
 
     def move(self, position, magnitude):
         if self.mode == "FPS":
-            front = pyrr.matrix33.apply_to_vector(self.removeY, self.cameraFront)
+            unit = math.sqrt(self.cameraFront[0] ** 2 + self.cameraFront[2] ** 2)
+            front = np.array([self.cameraFront[0] / unit, 0, self.cameraFront[2] / unit])
         elif self.mode == "FreeFly":
             front = self.cameraFront
 

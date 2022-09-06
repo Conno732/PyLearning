@@ -24,13 +24,21 @@ class Shader:
 
     def setFloatv4(self, name, values):
         glUniform4f(glGetUniformLocation(self.shader, name), values[0], values[1], values[2], values[3] )
+
+    def setFloatv3(self, name, values):
+        glUniform3f(glGetUniformLocation(self.shader, name), values[0], values[1], values[2])
         
     def setMatrix4vf(self, name, values):
         glUniformMatrix4fv(
             glGetUniformLocation(self.shader, name),
             1, GL_FALSE, values
         )
-
+    
+    def setMatrix3vf(self, name, values):
+        glUniformMatrix3fv(
+            glGetUniformLocation(self.shader, name),
+            1, GL_FALSE, values
+        )
 
 
     def delete(self):
