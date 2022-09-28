@@ -1,44 +1,37 @@
-from Camera import *
+from Rendering.Camera import *
 from imports import *
-from Material import *
-from Mesh import *
+from Rendering.Material import *
+from Rendering.Mesh import *
 from RenderObject import *
 from Shader import *
+from Rendering.RenderEngine import *
 
+RFP = "Rendering/"
+PFP = "Physics/"
 class App:
 
     def __init__(self, height, width):
-        pg.init()
-        pg.display.set_mode((height, width), pg.OPENGL | pg.DOUBLEBUF)
-        pg.event.set_grab(True)
+
+        self.renderEngine = RenderEngine(height= height, width= width)
         self.clock = pg.time.Clock()
-        self.window_height = height
-        self.window_width = width
-        glClearColor(0.1, 0, 0.1, 1)
-        glEnable(GL_BLEND)
-        glEnable(GL_DEPTH_TEST)
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        glEnable(GL_CULL_FACE); 
-        
-        pg.mouse.set_visible(False)
 
         self.shaderList = {
-            "v1" : Shader("shaders/v1/vertex.txt", "shaders/v1/fragment.txt"),
-            "v2" : Shader("shaders/v2/vertex.txt", "shaders/v2/fragment.txt"),
-            "lighting_v1" : Shader("shaders/lighting_v1/vertex.txt", "shaders/lighting_v1/fragment.txt")
+            "v1" : Shader(RFP + "shaders/v1/vertex.txt", RFP + "shaders/v1/fragment.txt"),
+            "v2" : Shader(RFP + "shaders/v2/vertex.txt", RFP + "shaders/v2/fragment.txt"),
+            "lighting_v1" : Shader( RFP + "shaders/lighting_v1/vertex.txt", RFP + "shaders/lighting_v1/fragment.txt")
         }
 
         self.meshList = {
-            "sphere" : Mesh("meshes/sphere.obj"),
-            "terrain" : Mesh("meshes/wierdland.obj"),
-            "cube" : Mesh("meshes/cube.obj")
+            "sphere" : Mesh(RFP + "meshes/sphere.obj"),
+            "terrain" : Mesh(RFP + "meshes/wierdland.obj"),
+            "cube" : Mesh(RFP + "meshes/cube.obj")
         }
 
         self.textureList = {
-            "wood" : Material("gfx/notha.jpg"),
-            "grass" : Material("gfx/grass.jpg"),
-            "missing" : Material("gfx/missing.jpg"),
-            "red" : Material("gfx/red.jpg")
+            "wood" : Material(RFP + "gfx/notha.jpg"),
+            "grass" : Material(RFP + "gfx/grass.jpg"),
+            "missing" : Material(RFP + "gfx/missing.jpg"),
+            "red" : Material(RFP + "gfx/red.jpg")
         }
 
         self.renderList = {
@@ -138,7 +131,9 @@ class App:
 
         }
        
-        
+
+        self.renderEngine.setRenderList(self.renderList)
+        self.renderEngine.setShaderList(self.shaderList)
         self.camera = Camera("FPS")
         
         
@@ -148,21 +143,24 @@ class App:
         
         self.running = True
         self.vector = 5
-        oldTime = pg.time.get_ticks()
         speed = 5
         sensitivity = 0.15
-        fovy = 90
         self.deltaTime = 1
         oldTime = 0
         self.radius = 20
         self.count = 0
+
         while (self.running):
+
+            #Time tracking -- Delta time calculation
             #pg.display.set_caption("FPS: " + str(1.0 / (self.deltaTime)))
             time = pg.time.get_ticks()
             self.deltaTime = ((time - oldTime) + 1) / 1000.0
             oldTime = time
             self.count += 0.5 * self.deltaTime
+            #End Time Tracking
 
+            #User Input event handling
             for event in pg.event.get():
                 if (event.type == pg.QUIT):
                     self.running = False
@@ -171,61 +169,30 @@ class App:
                     self.camera.rotateWithMouseOffset(offsets[0], offsets[1], sensitivity)
                 if event.type == pg.MOUSEBUTTONDOWN:
                     if event.button == 4:
-                        fovy -= 5
-                        if fovy < 1:
-                            fovy = 1
+                        self.camera.fovy -= 5
+                        if self.camera.fovy < 1:
+                            self.camera.fovy = 1
                     if event.button == 5:
-                        fovy += 5
-                        if fovy > 120:
-                            fovy = 120
-
-                    
-        
-                    
+                        self.camera.fovy += 5
+                        if self.camera.fovy > 120:
+                            self.camera.fovy = 120
             key = pg.key.get_pressed()
-
             self.playerInput(key, speed * self.deltaTime)
+            #End User Input handling
             
-            
+            # Non user input dynamics
             self.playground()
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-            
-            # maybe put this in the camera object... If there are multiple cameras, then different windows 
-            projection_transform = pyrr.matrix44.create_perspective_projection(
-                fovy= fovy, aspect= self.window_height/self.window_width,
-                near= 0.1, far= 100, dtype=np.float32
-            )
+            # End Dynamics
 
 
-            for shader in self.shaderList:
-                self.shaderList[shader].use()
-                self.shaderList[shader].setMatrix4vf("projection", projection_transform)
-                self.shaderList[shader].setMatrix4vf("view", self.camera.makeLookAt())
+            #3D rendering code
 
+                #Current idea is to allow for rendering for multiple windows in the future, maybe.
+                #Not sure if this is the best approach, we'll see.
+            self.renderEngine.update(self.camera)
 
-            for renderObjct in self.renderList:
-                obj = self.renderList[renderObjct]
-                obj.shader.use()
-                if (obj.texture):
-                    obj.texture.use()
-                else:
-                    self.textureList["missing"].use()
+            # End Rendering code
 
-                obj.shader.setFloatv4("objColor", obj.color)
-                model = obj.SRT()
-                obj.shader.setMatrix4vf("model", model)
-
-                if self.shaderList["v2"] == obj.shader:
-                    inverse = pyrr.matrix33.inverse(model)
-                    transpose = inverse.transpose()
-                    obj.shader.setMatrix3vf("NormalMatrix", transpose)
-                    obj.shader.setFloatv3("lightColor", [1.0, 1.0, 1.0])
-                    obj.shader.setFloatv3("lightPos", self.renderList["light"].position)
-                    obj.shader.setFloatv3("viewPos", self.camera.cameraPos)
-                
-                obj.draw()
-
-            pg.display.flip() 
 
             self.clock.tick(60)
         self.quit()
@@ -242,9 +209,7 @@ class App:
 
         self.renderList["light"].position[0] = (cos(self.count) * self.radius) + 20 
         self.renderList["light"].position[2] = (sin(self.count) * self.radius ) 
-        #self.renderList["light"].position[1] = (sin(self.count) * self.radius) + 10
-
-
+        
     def playerInput(self, key, speed):
         if key[pg.K_w]:
             self.camera.move("forward", speed)

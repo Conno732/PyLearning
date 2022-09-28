@@ -1,5 +1,5 @@
 from imports import *
-from Mesh import *
+from Rendering.Mesh import *
 
 class RenderObject:
 

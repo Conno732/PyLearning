@@ -3,7 +3,7 @@ from imports import *
 
 class Camera:
 
-    def __init__(self, mode):
+    def __init__(self, mode, fovy=90):
         self.cameraPos = pyrr.Vector3([0.0, 0.0, 3.0])
         self.cameraFront = pyrr.Vector3([0.0, 0.0, -1.0])
         self.cameraUp = pyrr.Vector3([0.0, 1.0, 0.0])
@@ -11,6 +11,7 @@ class Camera:
         self.pitch = 0.0
         self.yaw = -90.0
         self.mode = mode
+        self.fovy = fovy
 
     def makeLookAt(self):
         return pyrr.matrix44.create_look_at(self.cameraPos, self.cameraPos + self.cameraFront, self.cameraUp)
