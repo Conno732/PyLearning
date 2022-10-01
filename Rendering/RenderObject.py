@@ -1,4 +1,5 @@
 from imports import *
+
 from Rendering.Mesh import *
 
 class RenderObject:
@@ -11,7 +12,7 @@ class RenderObject:
         self.texture = texture
         self.color = color
         self.shader = shader
-        self.shader.use()
+       # self.shader.use()
         #self.shader.setInt("imageTexture", 0)
 
     def SRT(self):

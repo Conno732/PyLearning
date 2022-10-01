@@ -2,8 +2,8 @@ from Rendering.Camera import *
 from imports import *
 from Rendering.Material import *
 from Rendering.Mesh import *
-from RenderObject import *
-from Shader import *
+from Rendering.RenderObject import *
+from Rendering.Shader import *
 from Rendering.RenderEngine import *
 
 RFP = "Rendering/"
