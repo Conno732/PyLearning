@@ -3,8 +3,8 @@ from imports import *
 
 class PhysicsObject:
 
-    def __init__(self, position=[0, 0, 0], collisionModel = None, mass = 1):
-        self.position = np.array(position, dtype=np.float32)
+    def __init__(self, transform, collisionModel = None, mass = 1):
+        self.transform = transform
         self.velocity = np.array([0, 0, 0])
         self.Force = np.array([0, 0, 0])
         self.mass = mass

@@ -1,13 +1,12 @@
 from imports import *
+from HelperClasses import *
 
 from Rendering.Mesh import *
 
 class RenderObject:
 
-    def __init__(self, position, eulers, scale, mesh, shader, texture = False, color = [0, 0, 0, 0]):
-        self.position = np.array(position, dtype=np.float32)
-        self.eulers = np.array(eulers, dtype=np.float32)
-        self.scale = np.array(scale, dtype=np.float32)
+    def __init__(self, transform, mesh, shader, texture = False, color = [0, 0, 0, 0]):
+        self.transform = transform
         self.mesh = mesh
         self.texture = texture
         self.color = color
@@ -19,12 +18,12 @@ class RenderObject:
         # This translates the object into the world space
 
         model_transform = pyrr.matrix44.create_identity(dtype=np.float32)
-
+        
 
         model_transform = pyrr.matrix44.multiply(
             m1 = model_transform,
             m2 = pyrr.matrix44.create_from_scale(
-                scale= self.scale,
+                scale= self.transform.scale,
                 dtype=np.float32
             )
         )
@@ -32,7 +31,7 @@ class RenderObject:
         model_transform = pyrr.matrix44.multiply(
             m1=model_transform,
             m2=pyrr.matrix44.create_from_eulers(
-                eulers=np.radians(self.eulers),
+                eulers=np.radians(self.transform.rotation),
                 dtype=np.float32
             )
         )
@@ -40,13 +39,12 @@ class RenderObject:
         model_transform = pyrr.matrix44.multiply(
             m1=model_transform,
             m2=pyrr.matrix44.create_from_translation(
-                vec= self.position,
+                vec= self.transform.position,
                 dtype=np.float32
             )
         )
-
         return model_transform
 
-    def draw(self):
-        glBindVertexArray(self.mesh.vao)
-        glDrawArrays(GL_TRIANGLES, 0, self.mesh.vertex_count)
+    def draw(self, mesh):
+        glBindVertexArray(mesh.vao)
+        glDrawArrays(GL_TRIANGLES, 0, mesh.vertex_count)

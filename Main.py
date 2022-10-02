@@ -1,3 +1,5 @@
+from GameObjGen import GameObjGen
+from GameObject import GameObject
 from Rendering.Camera import *
 from imports import *
 from Rendering.Material import *
@@ -14,126 +16,133 @@ class App:
 
         self.renderEngine = RenderEngine(height= height, width= width)
         self.clock = pg.time.Clock()
+        self.GameObjGen = GameObjGen(self.renderEngine)
 
-        self.shaderList = {
+        self.renderEngine.shaderList = {
             "v1" : Shader(RFP + "shaders/v1/vertex.txt", RFP + "shaders/v1/fragment.txt"),
             "v2" : Shader(RFP + "shaders/v2/vertex.txt", RFP + "shaders/v2/fragment.txt"),
             "lighting_v1" : Shader( RFP + "shaders/lighting_v1/vertex.txt", RFP + "shaders/lighting_v1/fragment.txt")
         }
 
-        self.meshList = {
+        self.renderEngine.meshList = {
             "sphere" : Mesh(RFP + "meshes/sphere.obj"),
             "terrain" : Mesh(RFP + "meshes/wierdland.obj"),
             "cube" : Mesh(RFP + "meshes/cube.obj")
         }
 
-        self.textureList = {
+        self.renderEngine.textureList = {
             "wood" : Material(RFP + "gfx/notha.jpg"),
             "grass" : Material(RFP + "gfx/grass.jpg"),
             "missing" : Material(RFP + "gfx/missing.jpg"),
             "red" : Material(RFP + "gfx/red.jpg")
         }
 
-        self.renderList = {
-            "sphere1" : RenderObject(
-                position= [-2, 0, 0],
-                eulers= [0, 0, 0],
-                scale=[1, 1, 2],
-                mesh= self.meshList["sphere"],
-                shader= self.shaderList["v2"],
-                texture= self.textureList["wood"],
-            ),
-            "sphere11" : RenderObject(
-                position= [0, 2, 4],
-                eulers= [0, 0, 0],
-                scale=[1, 1, 2],
-                mesh= self.meshList["sphere"],
-                shader= self.shaderList["v2"],
-                texture= self.textureList["wood"],
-            ),
-             "sphere2" : RenderObject(
-                position= [1, 4, 1],
-                eulers= [0, 0, 0],
-                scale=[1, 1, 2],
-                mesh= self.meshList["sphere"],
-                shader= self.shaderList["v2"],
-                texture= self.textureList["wood"]
-            ),
-             "sphere3" : RenderObject(
-                position= [0, 1, 0],
-                eulers= [0, 0, 2],
-                scale=[1, 0.4, 1],
-                mesh= self.meshList["sphere"],
-                shader= self.shaderList["v2"],
-                texture= self.textureList["wood"]
-            ),
-            "sphere4" : RenderObject(
-                position= [1, 2, -3],
-                eulers= [0, 0, 0],
-                scale=[0.1, 0.1, 0.1],
-                mesh= self.meshList["sphere"],
-                shader= self.shaderList["v2"],
-                texture= self.textureList["wood"]
-            ),
-            "cube1" : RenderObject(
-                position= [20, 10, 0],
-                eulers=[0, 2, 4],
-                scale=[6, 6, 6],
-                mesh= self.meshList["cube"],
-                shader= self.shaderList["v2"],
-                texture= self.textureList["red"],
-                color=[1.0, 0.5, 0.31, 0.0]
-            ),
-            "terrain" : RenderObject(
-                position= [0, -3, 0],
-                eulers=[0,0,0],
-                scale=[1,1,1],
-                mesh= self.meshList["terrain"],
-                shader= self.shaderList["v2"],
-                texture= self.textureList["grass"],
-                color=[1.0, 0.5, 0.31, 0.0]
-            ),
-            "terrain2" : RenderObject(
-                position= [50, -3, 0],
-                eulers=[0,0,0],
-                scale=[1,1,1],
-                mesh= self.meshList["terrain"],
-                shader= self.shaderList["v2"],
-                texture= self.textureList["grass"],
-                color=[1.0, 0.5, 0.31, 0.0]
-            ),
-            "terrain3" : RenderObject(
-                position= [-50, -3, 0],
-                eulers=[0,0,0],
-                scale=[1,1,1],
-                mesh= self.meshList["terrain"],
-                shader= self.shaderList["v2"],
-                texture= self.textureList["grass"],
-                color=[1.0, 0.5, 0.31, 0.0]
-            ),
-            "terrain4" : RenderObject(
-                position= [-50, -3, 80],
-                eulers=[0,0,0],
-                scale=[1,1,1],
-                mesh= self.meshList["terrain"],
-                shader= self.shaderList["v2"],
-                texture= self.textureList["grass"],
-                color=[1.0, 0.5, 0.31, 0.0]
-            ),
-            "light" : RenderObject(
-                position=[0, 10, 0],
-                eulers=[0,0,0],
-                scale=[1,1,1],
-                mesh= self.meshList["cube"],
-                shader= self.shaderList["lighting_v1"],
-                texture= self.textureList["red"]
-            )
+        self.renderEngine.renderList = {
+            
+            # "sphere11" : RenderObject(
+            #     position= [0, 2, 4],
+            #     eulers= [0, 0, 0],
+            #     scale=[1, 1, 2],
+            #     mesh= self.meshList["sphere"],
+            #     shader= self.shaderList["v2"],
+            #     texture= self.textureList["wood"],
+            # ),
+            #  "sphere2" : RenderObject(
+            #     position= [1, 4, 1],
+            #     eulers= [0, 0, 0],
+            #     scale=[1, 1, 2],
+            #     mesh= self.meshList["sphere"],
+            #     shader= self.shaderList["v2"],
+            #     texture= self.textureList["wood"]
+            # ),
+            #  "sphere3" : RenderObject(
+            #     position= [0, 1, 0],
+            #     eulers= [0, 0, 2],
+            #     scale=[1, 0.4, 1],
+            #     mesh= self.meshList["sphere"],
+            #     shader= self.shaderList["v2"],
+            #     texture= self.textureList["wood"]
+            # ),
+            # "sphere4" : RenderObject(
+            #     position= [1, 2, -3],
+            #     eulers= [0, 0, 0],
+            #     scale=[0.1, 0.1, 0.1],
+            #     mesh= self.meshList["sphere"],
+            #     shader= self.shaderList["v2"],
+            #     texture= self.textureList["wood"]
+            # ),
+            # "cube1" : RenderObject(
+            #     position= [20, 10, 0],
+            #     eulers=[0, 2, 4],
+            #     scale=[6, 6, 6],
+            #     mesh= self.meshList["cube"],
+            #     shader= self.shaderList["v2"],
+            #     texture= self.textureList["red"],
+            #     color=[1.0, 0.5, 0.31, 0.0]
+            # ),
+            # "terrain" : RenderObject(
+            #     position= [0, -3, 0],
+            #     eulers=[0,0,0],
+            #     scale=[1,1,1],
+            #     mesh= self.meshList["terrain"],
+            #     shader= self.shaderList["v2"],
+            #     texture= self.textureList["grass"],
+            #     color=[1.0, 0.5, 0.31, 0.0]
+            # ),
+            # "terrain2" : RenderObject(
+            #     position= [50, -3, 0],
+            #     eulers=[0,0,0],
+            #     scale=[1,1,1],
+            #     mesh= self.meshList["terrain"],
+            #     shader= self.shaderList["v2"],
+            #     texture= self.textureList["grass"],
+            #     color=[1.0, 0.5, 0.31, 0.0]
+            # ),
+            # "terrain3" : RenderObject(
+            #     position= [-50, -3, 0],
+            #     eulers=[0,0,0],
+            #     scale=[1,1,1],
+            #     mesh= self.meshList["terrain"],
+            #     shader= self.shaderList["v2"],
+            #     texture= self.textureList["grass"],
+            #     color=[1.0, 0.5, 0.31, 0.0]
+            # ),
+            # "terrain4" : RenderObject(
+            #     position= [-50, -3, 80],
+            #     eulers=[0,0,0],
+            #     scale=[1,1,1],
+            #     mesh= self.meshList["terrain"],
+            #     shader= self.shaderList["v2"],
+            #     texture= self.textureList["grass"],
+            #     color=[1.0, 0.5, 0.31, 0.0]
+            # ),
+             "light" : RenderObject(
+                 transform= Transform(position=[0, 10, 0],
+                 rotation=[0,0,0],
+                 scale=[1,1,1]),
+                 mesh= "cube",
+                 shader= "lighting_v1",
+                 texture= "red"
+             )
 
         }
        
+        
 
-        self.renderEngine.setRenderList(self.renderList)
-        self.renderEngine.setShaderList(self.shaderList)
+        self.test = self.renderEngine.createRenderObject("sphere1" ,
+                transform= Transform( position= [-8, 0, 0],
+                rotation= [0, 0, 0],
+                scale=[1, 1, 2]),
+                mesh= "sphere",
+                shader= "v2",
+                texture= "wood")
+
+  
+
+        self.test2 = self.GameObjGen.createGameObj("testCube1").addRenderObject("cube", "v2", "red")
+
+
+
         self.camera = Camera("FPS")
         
         
@@ -181,7 +190,8 @@ class App:
             #End User Input handling
             
             # Non user input dynamics
-            self.playground()
+            #self.playground()
+            self.test.transform.scale[0] += 0.01
             # End Dynamics
 
 
@@ -230,14 +240,10 @@ class App:
         
 
     def quit(self):
-        for texture in self.textureList:
-            self.textureList[texture].destroy()
-        for mesh in self.meshList:
-            self.meshList[mesh].destroy()
-        for shader in self.shaderList:
-            self.shaderList[shader].delete()
+        self.renderEngine.destroy()
 
         pg.quit()
+
 
 
 if __name__ == "__main__":

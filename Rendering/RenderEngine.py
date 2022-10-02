@@ -1,4 +1,5 @@
 from imports import *
+from Rendering.RenderObject import *
 
 
 class RenderEngine:
@@ -23,12 +24,17 @@ class RenderEngine:
         self.textureList = {}
         self.renderList = {}
 
-    def setRenderList(self, objs):
-        self.renderList = objs
 
-    def setShaderList(self, shaders):
-        self.shaderList = shaders
+    def createRenderObject(self, name, transform, mesh, shader, texture = False, color = [0, 0, 0, 0]):
+        self.renderList[name] = RenderObject(
+                transform= transform,
+                mesh= mesh,
+                shader= shader,
+                texture= texture,
+                color= color
+            )
 
+        return self.renderList[name]
 
     def update(self, camera):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -48,25 +54,35 @@ class RenderEngine:
 
         for renderObjct in self.renderList:
             obj = self.renderList[renderObjct]
-            obj.shader.use()
-            if (obj.texture):
-                obj.texture.use()
+            shaderTmp = self.shaderList[obj.shader]
+            textTmp = self.textureList[obj.texture]
+            shaderTmp.use()
+            if (textTmp):
+                textTmp.use()
             else:
                 self.textureList["missing"].use()
 
-            obj.shader.setFloatv4("objColor", obj.color)
+            shaderTmp.setFloatv4("objColor", obj.color)
             model = obj.SRT()
-            obj.shader.setMatrix4vf("model", model)
+            shaderTmp.setMatrix4vf("model", model)
 
-            if self.shaderList["v2"] == obj.shader:
+            if self.shaderList["v2"] == shaderTmp: # instead of checking by name, assign a property of 'lightable' or something
                 inverse = pyrr.matrix33.inverse(model)
                 transpose = inverse.transpose()
-                obj.shader.setMatrix3vf("NormalMatrix", transpose)
-                obj.shader.setFloatv3("lightColor", [1.0, 1.0, 1.0])
-                obj.shader.setFloatv3("lightPos", self.renderList["light"].position)
-                obj.shader.setFloatv3("viewPos", camera.cameraPos)
                 
-            obj.draw()
+                shaderTmp.setMatrix3vf("NormalMatrix", transpose)
+                shaderTmp.setFloatv3("lightColor", [1.0, 1.0, 1.0])
+                shaderTmp.setFloatv3("lightPos", self.renderList["light"].transform.position)
+                shaderTmp.setFloatv3("viewPos", camera.cameraPos)
+                
+            obj.draw(self.meshList[obj.mesh])
 
         pg.display.flip() 
     
+    def destroy(self):
+        for texture in self.textureList:
+            self.textureList[texture].destroy()
+        for mesh in self.meshList:
+            self.meshList[mesh].destroy()
+        for shader in self.shaderList:
+            self.shaderList[shader].delete()
