@@ -1,13 +1,10 @@
 from Game import *
-from GameObject import GameObject
-from Rendering.Camera import *
 from imports import *
 from Rendering.Material import *
 from Rendering.Mesh import *
-from Rendering.RenderObject import *
 from Rendering.Shader import *
 from Rendering.RenderEngine import *
-
+from Rendering.Camera import *
 
 RFP = "Rendering/"
 PFP = "Physics/"
@@ -40,7 +37,6 @@ class App:
         }
         
 
-
         self.test = self.Game.createObj()
         self.test.addRenderObject("sphere", "v2", "wood")
   
@@ -55,11 +51,6 @@ class App:
                 scale=[1,1,1]))
         self.light.addRenderObject("sphere", "lighting_v1", "red", False, True)
 
-
-
-  
-        
-        
         self.mainLoop()
 
     def mainLoop(self):

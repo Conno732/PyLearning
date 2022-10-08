@@ -61,7 +61,6 @@ class Game:
         self.objectCounter += 1
         self.objectList[name] = GameObject(name, self.renderEngine, self.physicsEngine, self.transform)
         # Have a method for overwriting objects?!?!? How!?!?
-        print(self.objectList)
         return self.objectList[name]
 
     def getObj(self, name):
