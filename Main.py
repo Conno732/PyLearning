@@ -101,13 +101,8 @@ class App:
             # End Dynamics
 
 
-            #3D rendering code
-
-                #Current idea is to allow for rendering for multiple windows in the future, maybe.
-                #Not sure if this is the best approach, we'll see.
+           # calls the update functions for each engine held by the game
             self.Game.updateEngineStates()
-
-            # End Rendering code
 
 
             self.clock.tick(60)
