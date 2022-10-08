@@ -1,4 +1,4 @@
-from GameObjGen import GameObjGen
+from Game import *
 from GameObject import GameObject
 from Rendering.Camera import *
 from imports import *
@@ -8,6 +8,7 @@ from Rendering.RenderObject import *
 from Rendering.Shader import *
 from Rendering.RenderEngine import *
 
+
 RFP = "Rendering/"
 PFP = "Physics/"
 class App:
@@ -16,7 +17,8 @@ class App:
 
         self.renderEngine = RenderEngine(height= height, width= width)
         self.clock = pg.time.Clock()
-        self.GameObjGen = GameObjGen(self.renderEngine)
+        self.camera = Camera("FPS")
+        self.Game = Game(self.camera, self.renderEngine)
 
         self.renderEngine.shaderList = {
             "v1" : Shader(RFP + "shaders/v1/vertex.txt", RFP + "shaders/v1/fragment.txt"),
@@ -36,114 +38,26 @@ class App:
             "missing" : Material(RFP + "gfx/missing.jpg"),
             "red" : Material(RFP + "gfx/red.jpg")
         }
-
-        self.renderEngine.renderList = {
-            
-            # "sphere11" : RenderObject(
-            #     position= [0, 2, 4],
-            #     eulers= [0, 0, 0],
-            #     scale=[1, 1, 2],
-            #     mesh= self.meshList["sphere"],
-            #     shader= self.shaderList["v2"],
-            #     texture= self.textureList["wood"],
-            # ),
-            #  "sphere2" : RenderObject(
-            #     position= [1, 4, 1],
-            #     eulers= [0, 0, 0],
-            #     scale=[1, 1, 2],
-            #     mesh= self.meshList["sphere"],
-            #     shader= self.shaderList["v2"],
-            #     texture= self.textureList["wood"]
-            # ),
-            #  "sphere3" : RenderObject(
-            #     position= [0, 1, 0],
-            #     eulers= [0, 0, 2],
-            #     scale=[1, 0.4, 1],
-            #     mesh= self.meshList["sphere"],
-            #     shader= self.shaderList["v2"],
-            #     texture= self.textureList["wood"]
-            # ),
-            # "sphere4" : RenderObject(
-            #     position= [1, 2, -3],
-            #     eulers= [0, 0, 0],
-            #     scale=[0.1, 0.1, 0.1],
-            #     mesh= self.meshList["sphere"],
-            #     shader= self.shaderList["v2"],
-            #     texture= self.textureList["wood"]
-            # ),
-            # "cube1" : RenderObject(
-            #     position= [20, 10, 0],
-            #     eulers=[0, 2, 4],
-            #     scale=[6, 6, 6],
-            #     mesh= self.meshList["cube"],
-            #     shader= self.shaderList["v2"],
-            #     texture= self.textureList["red"],
-            #     color=[1.0, 0.5, 0.31, 0.0]
-            # ),
-            # "terrain" : RenderObject(
-            #     position= [0, -3, 0],
-            #     eulers=[0,0,0],
-            #     scale=[1,1,1],
-            #     mesh= self.meshList["terrain"],
-            #     shader= self.shaderList["v2"],
-            #     texture= self.textureList["grass"],
-            #     color=[1.0, 0.5, 0.31, 0.0]
-            # ),
-            # "terrain2" : RenderObject(
-            #     position= [50, -3, 0],
-            #     eulers=[0,0,0],
-            #     scale=[1,1,1],
-            #     mesh= self.meshList["terrain"],
-            #     shader= self.shaderList["v2"],
-            #     texture= self.textureList["grass"],
-            #     color=[1.0, 0.5, 0.31, 0.0]
-            # ),
-            # "terrain3" : RenderObject(
-            #     position= [-50, -3, 0],
-            #     eulers=[0,0,0],
-            #     scale=[1,1,1],
-            #     mesh= self.meshList["terrain"],
-            #     shader= self.shaderList["v2"],
-            #     texture= self.textureList["grass"],
-            #     color=[1.0, 0.5, 0.31, 0.0]
-            # ),
-            # "terrain4" : RenderObject(
-            #     position= [-50, -3, 80],
-            #     eulers=[0,0,0],
-            #     scale=[1,1,1],
-            #     mesh= self.meshList["terrain"],
-            #     shader= self.shaderList["v2"],
-            #     texture= self.textureList["grass"],
-            #     color=[1.0, 0.5, 0.31, 0.0]
-            # ),
-             "light" : RenderObject(
-                 transform= Transform(position=[0, 10, 0],
-                 rotation=[0,0,0],
-                 scale=[1,1,1]),
-                 mesh= "cube",
-                 shader= "lighting_v1",
-                 texture= "red"
-             )
-
-        }
-       
         
 
-        self.test = self.renderEngine.createRenderObject("sphere1" ,
-                transform= Transform( position= [-8, 0, 0],
-                rotation= [0, 0, 0],
-                scale=[1, 1, 2]),
-                mesh= "sphere",
-                shader= "v2",
-                texture= "wood")
 
+        self.test = self.Game.createObj()
+        self.test.addRenderObject("sphere", "v2", "wood")
   
 
-        self.test2 = self.GameObjGen.createGameObj("testCube1").addRenderObject("cube", "v2", "red")
+        self.test2 = self.Game.createObj("testCube1")
+        self.test2.addRenderObject("cube", "v2", "red")
+
+        self.light = self.Game.createObj("light", 
+            Transform(
+                position=[0, 10, 0],
+                rotation=[0,0,0],
+                scale=[1,1,1]))
+        self.light.addRenderObject("sphere", "lighting_v1", "red", False, True)
 
 
 
-        self.camera = Camera("FPS")
+  
         
         
         self.mainLoop()
@@ -191,7 +105,8 @@ class App:
             
             # Non user input dynamics
             #self.playground()
-            self.test.transform.scale[0] += 0.01
+            self.test.transform.position[0] += 0.01
+            self.test2.transform.rotation[2] += 0.5
             # End Dynamics
 
 
@@ -199,7 +114,7 @@ class App:
 
                 #Current idea is to allow for rendering for multiple windows in the future, maybe.
                 #Not sure if this is the best approach, we'll see.
-            self.renderEngine.update(self.camera)
+            self.Game.updateEngineStates()
 
             # End Rendering code
 
@@ -237,6 +152,9 @@ class App:
             self.running = False
         if key[pg.K_0]:
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+        if key[pg.K_1]:
+            # some sort of 'event handler' should be implemented, as this will create multiple objects
+            self.Game.createObj("testcube23").addRenderObject("cube", "v2", "red")
         
 
     def quit(self):

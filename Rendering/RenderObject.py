@@ -5,12 +5,14 @@ from Rendering.Mesh import *
 
 class RenderObject:
 
-    def __init__(self, transform, mesh, shader, texture = False, color = [0, 0, 0, 0]):
+    def __init__(self, transform, mesh, shader, texture, isLightAble = True, isLight = False, color = [0, 0, 0, 0]):
         self.transform = transform
         self.mesh = mesh
         self.texture = texture
         self.color = color
         self.shader = shader
+        self.isLight = isLight
+        self.isLightAble = isLightAble
        # self.shader.use()
         #self.shader.setInt("imageTexture", 0)
 

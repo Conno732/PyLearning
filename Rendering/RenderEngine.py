@@ -25,12 +25,14 @@ class RenderEngine:
         self.renderList = {}
 
 
-    def createRenderObject(self, name, transform, mesh, shader, texture = False, color = [0, 0, 0, 0]):
+    def createRenderObject(self, name, transform, mesh, shader, texture, isLightable = True, isLight = False, color = [0, 0, 0, 0]):
         self.renderList[name] = RenderObject(
                 transform= transform,
                 mesh= mesh,
                 shader= shader,
                 texture= texture,
+                isLight= isLight,
+                isLightAble= isLightable,
                 color= color
             )
 
@@ -57,16 +59,14 @@ class RenderEngine:
             shaderTmp = self.shaderList[obj.shader]
             textTmp = self.textureList[obj.texture]
             shaderTmp.use()
-            if (textTmp):
-                textTmp.use()
-            else:
-                self.textureList["missing"].use()
+            
+            textTmp.use()
 
             shaderTmp.setFloatv4("objColor", obj.color)
             model = obj.SRT()
             shaderTmp.setMatrix4vf("model", model)
 
-            if self.shaderList["v2"] == shaderTmp: # instead of checking by name, assign a property of 'lightable' or something
+            if obj.isLightAble: # instead of checking by name, assign a property of 'lightable' or something
                 inverse = pyrr.matrix33.inverse(model)
                 transpose = inverse.transpose()
                 

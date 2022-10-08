@@ -4,7 +4,6 @@
 
 This is a (in development) 3D rendering application with a physics engine on the (ever so distant) horizon. The purpose of this project is for self learning and a reference for any future related projects.
 
-
 ### Features (unchecked features are still in progress, or on the backlog)
 
 - [x] Imports file
@@ -26,7 +25,7 @@ This is a (in development) 3D rendering application with a physics engine on the
 - [x] Material class, used for importing image data and sampled by the vertex texture data
 
 - [x] 'Camera' class, allowing for the user to traverse the 3D world.
-- [ ] Basic lighting
+- [x] Basic lighting
 - [ ] Additional model loading
 - [ ] Advanced OpenGL stuff (cool shaders n stuff, skyboxes, frame culling, anti aliasing )
 - [ ] Manipulation of vertices during runtime for physics purposes (soft body, destructible, etc.)
@@ -55,7 +54,7 @@ The main idea for an end product would be as follows (pseudocode mockup):
 ```
 Start Program;
 
-Function Init():
+// Initialization
 	// Binding the physics engine with the 3D renderer makes a 'game' engine
 	Game = GameManager();
 
@@ -86,6 +85,14 @@ Function Init():
 	// More research is needed here, but the general idea is that a rigid body
 	//    is what responds to collisions
 	Cube.getComponent("BoxCollider").addRigidBody()
+
+// Looping
+
+	// The user would likely use this themselves, the game engine does not use this stuff by itself
+	DeltaTime = ComputeDeltaTime()
+
+	// Dynamics
+	Game.HandleEvents()
 
 // more stuff to come
 ```
