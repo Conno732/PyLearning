@@ -4,7 +4,7 @@ from Rendering.RenderObject import *
 
 class RenderEngine:
 
-    def __init__(self, height, width):
+    def __init__(self, height: int, width: int):
         pg.init()
         pg.display.set_mode((height, width), pg.OPENGL | pg.DOUBLEBUF)
         pg.event.set_grab(True)
@@ -37,6 +37,9 @@ class RenderEngine:
             )
 
         return self.renderList[name]
+
+    def deleteRenderObject(self, name):
+        pass
 
     def update(self, camera):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)

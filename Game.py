@@ -1,3 +1,4 @@
+import string
 from imports import *
 from HelperClasses import *
 from GameObject import *
@@ -17,18 +18,25 @@ class Game:
         self.camera = camera
         self.objectCounter = 0
 
-        self.events = []
+        # create a queue object here TODO
+        # self.events = 
+        # Idea for contructing events,
+        #  events are objects, and they are created from classes bound by the event interface
+        #  the events can be triggered, which pushed an object onto the stack for use
+        #  so I can create a 'make red cube' event and trigger it multiple times
+        #  this would push the event onto the event queue, which will be used to process events
+        #  could be a potentially powerful tool?!?
 
-
-    def updateEngineStates(self):
+       
+    def updateEngineStates(self, dt = 0):
         # Updates both engines to the next state
         
         # Note, the order of updating is signifigant.
-        #    The main workflow is that the physics engine computes the new locations
+        #    The main process is that the physics engine computes the new locations
         #     and the render engine draws those objects with their updated positions
 
         if self.physicsEngine:
-            self.physicsEngine.update()
+            self.physicsEngine.update(dt)
 
         if self.renderEngine:
             self.renderEngine.update(self.camera)
@@ -36,7 +44,7 @@ class Game:
 
     # I think some method of event handling is a good idea
     #    I'm not sure what it should look like at the momment,
-    #     But the general idea would be to have a list of events that anything can add to
+    #     But the general idea would be to have a queue of events that anything can add to
     #      These events would fall under an interface, and would have a resolution to them
     #      Events would mainly be related to user input, to prevent certain misshaps on their end
     def handleEvents(self):
@@ -44,7 +52,7 @@ class Game:
 
         
 
-    def createObj(self, name = False, transform = False):
+    def createObj(self, name : string = False, transform : Transform = False):
 
         # This function creates a game object:
         #    Param: name -> Default gives it a default value, used to track the game object

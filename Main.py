@@ -10,12 +10,13 @@ RFP = "Rendering/"
 PFP = "Physics/"
 class App:
 
-    def __init__(self, height, width):
+    def __init__(self, height: int, width: int):
 
         self.renderEngine = RenderEngine(height= height, width= width)
+        self.physicsEngine = PhysicsEngine(-9.8)
         self.clock = pg.time.Clock()
         self.camera = Camera("FPS")
-        self.Game = Game(self.camera, self.renderEngine)
+        self.Game = Game(self.camera, self.renderEngine, self.physicsEngine)
 
         self.renderEngine.shaderList = {
             "v1" : Shader(RFP + "shaders/v1/vertex.txt", RFP + "shaders/v1/fragment.txt"),
@@ -26,7 +27,8 @@ class App:
         self.renderEngine.meshList = {
             "sphere" : Mesh(RFP + "meshes/sphere.obj"),
             "terrain" : Mesh(RFP + "meshes/wierdland.obj"),
-            "cube" : Mesh(RFP + "meshes/cube.obj")
+            "cube" : Mesh(RFP + "meshes/cube.obj"),
+            "cone" : Mesh(RFP + "meshes/cone.obj")
         }
 
         self.renderEngine.textureList = {
@@ -37,31 +39,37 @@ class App:
         }
         
 
-        self.test = self.Game.createObj()
+        self.test = self.Game.createObj(transform=Transform(position=[5, 0, 5], scale=[5, 5, 5]))
         self.test.addRenderObject("sphere", "v2", "wood")
   
 
         self.test2 = self.Game.createObj("testCube1")
         self.test2.addRenderObject("cube", "v2", "red")
 
-        self.light = self.Game.createObj("light", 
+        self.cone : GameObject = self.Game.createObj(transform= 
             Transform(
-                position=[0, 10, 0],
+                position=[-4, 4, 0],
                 rotation=[0,0,0],
-                scale=[1,1,1]))
+                scale=[2,2,2]))
+        self.cone.addRenderObject("cone", "v2", "wood")
+        self.cone.addPhysicsObject(mass=1)
+
+        self.light : GameObject = self.Game.createObj("light", 
+            Transform(
+                position=[0, 15, 0],
+                rotation=[0,0,0],
+                scale=[0.5,0.5,0.5]))
         self.light.addRenderObject("sphere", "lighting_v1", "red", False, True)
 
         self.mainLoop()
 
     def mainLoop(self):
-        
         self.running = True
         self.vector = 5
         speed = 5
         sensitivity = 0.15
         self.deltaTime = 1
         oldTime = 0
-        self.radius = 20
         self.count = 0
 
         while (self.running):
@@ -95,31 +103,24 @@ class App:
             #End User Input handling
             
             # Non user input dynamics
-            #self.playground()
-            self.test.transform.position[0] += 0.01
-            self.test2.transform.rotation[2] += 0.5
+            self.playground()
+
             # End Dynamics
 
 
            # calls the update functions for each engine held by the game
-            self.Game.updateEngineStates()
+            self.Game.updateEngineStates(self.deltaTime)
 
 
             self.clock.tick(60)
         self.quit()
 
     def playground(self):
-        self.renderList["sphere1"].position[2] += self.vector * self.deltaTime
-            
-        self.renderList["sphere1"].eulers[0] += 300 * self.deltaTime
-            
-        if (self.renderList["sphere1"].eulers[0] > 360):
-            self.renderList["sphere1"].eulers[0] -= 360
-        if (self.renderList["sphere1"].position[2] < -10) or self.renderList["sphere1"].position[2] > 10:
-            self.vector *= -1 
-
-        self.renderList["light"].position[0] = (cos(self.count) * self.radius) + 20 
-        self.renderList["light"].position[2] = (sin(self.count) * self.radius ) 
+        self.test2.transform.rotation[2] += 0.5
+        self.light.transform.position[2] = 20 * cos(self.count)
+        self.light.transform.position[0] = 20 * sin(self.count)  
+        
+        
         
     def playerInput(self, key, speed):
         if key[pg.K_w]:
@@ -141,7 +142,8 @@ class App:
         if key[pg.K_1]:
             # some sort of 'event handler' should be implemented, as this will create multiple objects
             self.Game.createObj("testcube23").addRenderObject("cube", "v2", "red")
-        
+        if key[pg.K_UP]:
+            self.cone.physicsObject.Force[1] += 20
 
     def quit(self):
         self.renderEngine.destroy()

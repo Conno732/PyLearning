@@ -17,4 +17,3 @@ class Transform:
         self.position = np.array(position, dtype=np.float32)
         self.rotation = np.array(rotation, dtype=np.float32)
         self.scale = np.array(scale, dtype=np.float32)
-        

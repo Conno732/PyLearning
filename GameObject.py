@@ -1,3 +1,6 @@
+import string
+from Physics.PhysicsEngine import PhysicsEngine
+from Rendering.RenderEngine import RenderEngine
 from imports import *
 from HelperClasses import *
 
@@ -13,20 +16,23 @@ from HelperClasses import *
 #     relative position to the object. Look into this in the future
 class GameObject:
     # each game object has a pointer to the render and physics engine. May not be the best idea, but allows them to make 
-    def __init__(self, name, renderEngine, physicsEngine, transform):
+    def __init__(self, name : string, renderEngine : RenderEngine, physicsEngine : PhysicsEngine, transform : Transform):
         self.name = name
-        self.transform = transform
+        self.transform : Transform = transform
         self.renderEngine = renderEngine
         self.physicsEngine = physicsEngine
-        self.render_object = None
-        self.physics_object = None
+        self.renderObject = None
+        self.physicsObject = None
         # Tags are used to group and select multiple objects
         self.tags = {} 
 
     # does it make sense to allow the game object to have direct access to the engines? Should the game manager not handle this?
     def addRenderObject(self, mesh, shader, texture, isLightable = True, isLight = False, color = [0, 0, 0, 0]):
         # maybe turn params into defaults
-        self.render_object = self.renderEngine.createRenderObject(self.name, self.transform, mesh, shader, texture, isLightable, isLight, color)
+        self.renderObject = self.renderEngine.createRenderObject(self.name, self.transform, mesh, shader, texture, isLightable, isLight, color)
+
+    def addPhysicsObject(self, collisionModel = None, mass = 1):
+        self.physicsObject = self.physicsEngine.createPhysicsObject(self.name, self.transform, collisionModel, mass)
 
     def addTag(self):
         pass
